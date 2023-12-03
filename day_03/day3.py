@@ -46,7 +46,9 @@ class Grid:
     def max_col(self):
         return len(self.rows[0].cells) - 1
 
-    def check_grid_for_symbol(self, start: Coordinate, end: Coordinate) -> bool:
+    def check_grid_for_symbol(
+        self, start: Coordinate, end: Coordinate, specific_symbol: str | None = None
+    ) -> bool:
         """look in a grid for symbols nearby"""
         start_x, start_y = start
         start_x = start_x if start_x > 0 else 0
@@ -57,7 +59,10 @@ class Grid:
         for idx_x in range(start_x, end_x + 1):
             for idx_y in range(start_y, end_y + 1):
                 cell = self.rows[idx_y].cells[idx_x]
-                if cell.is_symbol:
+                if specific_symbol:
+                    if cell.value == specific_symbol:
+                        return True
+                elif cell.is_symbol:
                     return True
         return False
 
@@ -74,6 +79,15 @@ class Number:
     @property
     def end(self) -> Coordinate:
         return self.cells[-1].coordinates
+
+    def overlaps(self, start: Coordinate, end: Coordinate, threshold: int) -> bool:
+        check_start_x, check_start_y = start
+        check_end_x, check_end_y = end
+        start_x, start_y = self.start
+        end_x, end_y = self.end
+        return (check_start_x - threshold <= end_x and check_end_x + threshold >= start_x) and (
+            check_start_y - threshold <= end_y and check_end_y + threshold >= start_y
+        )
 
 
 def build_grid(data: list[str]) -> Grid:
@@ -113,7 +127,9 @@ def find_numbers(grid: Grid) -> list[Number]:
     return numbers
 
 
-def filter_for_numbers_with_symbols_near(grid: Grid, numbers: list[Number]) -> list[Number]:
+def filter_for_numbers_with_symbols_near(
+    grid: Grid, numbers: list[Number], specific_symbol: str | None = None
+) -> list[Number]:
     filtered_numbers: list[Number] = []
     for n in numbers:
         start_x, start_y = n.start
@@ -128,7 +144,7 @@ def filter_for_numbers_with_symbols_near(grid: Grid, numbers: list[Number]) -> l
             end_x + 1,
             end_y + 1,
         )
-        if grid.check_grid_for_symbol(start, end):
+        if grid.check_grid_for_symbol(start, end, specific_symbol):
             filtered_numbers.append(n)
     return filtered_numbers
 
@@ -144,5 +160,35 @@ def part_1(data: list[str]) -> int:
     return sum([n.value for n in valid_numbers])
 
 
+def find_symbols(grid: Grid, symbol=str) -> list[Cell]:
+    symbols: list[Cell] = []
+    for row in grid.rows:
+        for cell in row.cells:
+            if cell.value == symbol:
+                symbols.append(cell)
+
+    return symbols
+
+
+def part_2(data: list[str]) -> int:
+    grid = build_grid(data)
+    numbers = find_numbers(grid)
+    print(numbers)
+    valid_numbers = filter_for_numbers_with_symbols_near(grid, numbers, specific_symbol="*")
+    gears = find_symbols(grid, "*")
+    ratios = []
+    for gear in gears:
+        print("+" * 20)
+        print(gear)
+        print("overlaps")
+        overlaps = [x for x in valid_numbers if x.overlaps(gear.coordinates, gear.coordinates, 1)]
+        print(overlaps)
+        if len(overlaps) == 2:
+            ratio = overlaps[0].value * overlaps[1].value
+            ratios.append(ratio)
+    return sum(ratios)
+
+
 if __name__ == "__main__":
     print(part_1(get_raw_data("./input.txt")))
+    print(part_2(get_raw_data("./input.txt")))
