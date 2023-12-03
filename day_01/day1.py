@@ -1,7 +1,4 @@
 import re
-from collections import defaultdict
-
-import polars as pl
 
 
 def get_raw_data(path: str) -> list[str]:

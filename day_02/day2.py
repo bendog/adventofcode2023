@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from functools import reduce
+from operator import mul
 
 
 def get_raw_data(path: str) -> list[str]:
@@ -18,6 +20,9 @@ class Game:
     game_id: int
     hands: list[Hand]
 
+    def maximum_colour(self, colour):
+        return max([getattr(hand, colour) for hand in self.hands])
+
 
 def parse_line(string: str) -> Game:
     game_id, raw_hands = string.split(":")
@@ -35,9 +40,8 @@ def parse_line(string: str) -> Game:
 
 def check_game_under_max(game, maximums):
     for max_colour, max_value in maximums.items():
-        for hand in game.hands:
-            if getattr(hand, max_colour) > max_value:
-                return False
+        if game.maximum_colour(max_colour) > max_value:
+            return False
     return True
 
 
@@ -66,6 +70,27 @@ def part_1(data: list[str]) -> int:
     return sum([g.game_id for g in filter_games])
 
 
+def part_2(data: list[str]) -> int:
+    games = []
+    for line in data:
+        games.append(parse_line(line))
+
+    # get maximums
+    maximums = []
+    for game in games:
+        maximums.append(
+            [
+                game.maximum_colour(c)
+                for c in ["red", "green", "blue"]
+                if game.maximum_colour(c) > 0
+            ]
+        )
+
+    powers = [reduce(mul, x) for x in maximums]
+
+    return sum(powers)
+
+
 if __name__ == "__main__":
-    raw_data = get_raw_data("./day2input.txt")
-    print(part_1(raw_data))
+    print(part_1(get_raw_data("./day2input.txt")))
+    print(part_2(get_raw_data("./day2input.txt")))
