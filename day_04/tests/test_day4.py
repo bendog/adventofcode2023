@@ -39,3 +39,7 @@ def test_day4_part1_card_score():
 
 def test_day4_part1():
     assert day4.part_1(TEST_DATA) == 13
+
+
+def test_day4_part2():
+    assert day4.part_2(TEST_DATA) == 30

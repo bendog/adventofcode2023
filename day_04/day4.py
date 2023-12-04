@@ -11,6 +11,7 @@ class Card:
     card_id: int
     winning_numbers: list[int]
     numbers: list[int]
+    copies: int = 1
 
     def winners(self) -> list[int]:
         return [x for x in self.numbers if x in self.winning_numbers]
@@ -38,9 +39,24 @@ def parse_line(line: str) -> Card:
 def part_1(data: list[str]) -> int:
     """solve for part 1"""
     cards: list[Card] = [parse_line(line) for line in data if line.strip()]
-    print(cards)
     return sum([x.score() for x in cards])
+
+
+def part_2(data: list[str]) -> int:
+    """solve for part 1"""
+    cards: list[Card] = [parse_line(line) for line in data if line.strip()]
+    # return sum([x.score() for x in cards])
+    for idx in range(len(cards)):
+        # print(card.copies)
+        card = cards[idx]
+        score = len(card.winners())
+        start = idx + 1
+        stop = start + score
+        for idn in range(start, stop if stop < len(cards) else len(cards)):
+            cards[idn].copies += card.copies
+    return sum([card.copies for card in cards])
 
 
 if __name__ == "__main__":
     print(part_1(get_raw_data("./input.txt")))
+    print(part_2(get_raw_data("./input.txt")))
