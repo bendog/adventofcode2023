@@ -1,8 +1,9 @@
+import datetime
 from collections import defaultdict
 from dataclasses import dataclass, field
 
 
-@dataclass
+@dataclass(slots=True)
 class Seed:
     id: int
     soil: int = None
@@ -78,6 +79,41 @@ def part_1(raw_data: list[str]) -> int:
     return min([x.location for x in seeds])
 
 
+###
+# PART TWO NEEDS A REWRITE
+###
+
+
+def process_seeds_part2(sections: Sections) -> list[Seed]:
+    seeds = []
+    iter_seeds = iter(sections["seeds"])
+    seed_pairs = list(zip(iter_seeds, iter_seeds))
+    for start, length in seed_pairs:
+        for x in range(start, start + length):
+            seeds.append(Seed(x))
+    return seeds
+
+
+def part_2(raw_data: list[str]) -> int:
+    start = datetime.datetime.now().timestamp()
+    sections = split_sections(raw_data)
+    seeds: list[Seed] = process_seeds_part2(sections)
+    print(
+        f"created {len(seeds)} seeds - {(datetime.datetime.now().timestamp() - start):.2f} seconds"
+    )
+    segment = datetime.datetime.now().timestamp()
+    process_maps(seeds, sections)
+    print(
+        f"processed {len(seeds)} seeds - {(datetime.datetime.now().timestamp() - segment):.2f} / {(datetime.datetime.now().timestamp() - start):.2f} seconds"
+    )
+    segment = datetime.datetime.now().timestamp()
+    minimum = min(x.location for x in seeds)
+    print(
+        f"found minimum {minimum} - {(datetime.datetime.now().timestamp() - segment):.2f} / {(datetime.datetime.now().timestamp() - start):.2f} seconds"
+    )
+    return minimum
+
+
 def get_raw_data(path: str) -> list[str]:
     """fetch raw data from file"""
     with open(path) as f:
@@ -86,4 +122,4 @@ def get_raw_data(path: str) -> list[str]:
 
 if __name__ == "__main__":
     print(part_1(get_raw_data("./input.txt")))
-    # print(part_2(get_raw_data("./input.txt")))
+    print(part_2(get_raw_data("./input.txt")))

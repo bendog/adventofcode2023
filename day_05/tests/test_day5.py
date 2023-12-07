@@ -39,3 +39,7 @@ TEST_DATA = [
 
 def test_day5_part1():
     assert day5.part_1(TEST_DATA) == 35
+
+
+def test_day5_part2():
+    assert day5.part_2(TEST_DATA) == 46
