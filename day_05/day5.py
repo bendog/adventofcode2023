@@ -5,27 +5,39 @@ from dataclasses import dataclass, field
 @dataclass
 class Seed:
     id: int
-    soil_set: set[int] = field(default_factory=set)
-    fertilizer_set: set[int] = field(default_factory=set)
-    water_set: set[int] = field(default_factory=set)
-    light_set: set[int] = field(default_factory=set)
-    temperature_set: set[int] = field(default_factory=set)
-    humidity_set: set[int] = field(default_factory=set)
-    location_set: set[int] = field(default_factory=set)
+    soil: int = None
+    fertilizer: int = None
+    water: int = None
+    light: int = None
+    temperature: int = None
+    humidity: int = None
+    location: int = None
 
-    def process_range(self, from_str, to_str, from_values, to_values):
-        if from_str == "seed":
-            if self.id not in from_values:
-                return
-            else:
-                getattr(self, f"{to_str}_set").update(to_values)
+    @staticmethod
+    def match_value(from_val: int, from_start: int, to_start: int) -> int:
+        """given these have already matched, return the to_value to match the from_value difference"""
+        return to_start + (from_val - from_start)
+
+    def process_maps(self, map_from: str, map_to: str, values: list[list[int]]):
+        """process the map selection for this seed"""
+        from_value: int
+        to_value: int
+        # Get the from value to check against
+        if map_from == "seed":
+            from_value = self.id
         else:
-            if getattr(self, f"{from_str}_set").intersection(set(from_values)):
-                getattr(self, f"{to_str}_set").update(to_values)
-        pass
+            from_value = getattr(self, map_from)
+        # set the default to value
+        to_value = from_value
+
+        for to_start, from_start, length in values:
+            if from_start <= from_value <= from_start + length:
+                to_value = self.match_value(from_value, from_start, to_start)
+                break
+        setattr(self, map_to, to_value)
 
 
-Sections = dict[str, list[int]]
+Sections = dict[str, list[int | list[int]]]
 
 
 def split_sections(data: list[str]) -> Sections:
@@ -54,12 +66,8 @@ def process_maps(seeds: list[Seed], sections: Sections):
     for section_title, value_list in sections.items():
         if "-to-" in section_title:
             map_from, map_to = section_title.strip().split("-to-")
-            for to_start, from_start, length in value_list:
-                from_values = list(range(from_start, from_start + length))
-                to_values = list(range(to_start, to_start + length))
-                for seed in seeds:
-                    seed.process_range(map_from, map_to, from_values, to_values)
-
+            for seed in seeds:
+                seed.process_maps(map_from, map_to, value_list)
     pass
 
 
@@ -67,7 +75,7 @@ def part_1(raw_data: list[str]) -> int:
     sections = split_sections(raw_data)
     seeds: list[Seed] = process_seeds(sections)
     process_maps(seeds, sections)
-    return
+    return min([x.location for x in seeds])
 
 
 def get_raw_data(path: str) -> list[str]:
