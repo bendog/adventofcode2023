@@ -31,7 +31,22 @@ def part_1(raw_data: list[str]) -> int:
     return reduce(mul, (len(x) for x in valid_races))
 
 
+def get_race(raw_data: list[str]) -> Race:
+    time, distance = raw_data[0:2]
+    time = int(time.replace("Time:", "").replace(" ", ""))
+    distance = int(distance.replace("Distance:", "").replace(" ", ""))
+    return Race(time, distance)
+    pass
+
+
 def part_2(raw_data: list[str]) -> int:
+    """BRUTE FORCE JERKS AGAIN"""
+    race = get_race(raw_data)
+    hold_time: int = 0
+    for hold_time in range(1, race.time):
+        if get_distance(hold_time, race.time) > race.distance:
+            break
+    return race.time - (hold_time * 2) + 1
     pass
 
 

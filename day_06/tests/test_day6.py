@@ -23,3 +23,7 @@ def test_get_distance():
 
 def test_filter_distances():
     assert day6.filter_distances(7, 9) == [10, 12, 12, 10]
+
+
+def test_day6_part2():
+    assert day6.part_2(TEST_DATA) == 71503
