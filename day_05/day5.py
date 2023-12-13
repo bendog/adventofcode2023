@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 
-@dataclass(slots=True)
+@dataclass
 class Seed:
     id: int
     soil: int = None
@@ -98,13 +98,15 @@ def part_2(raw_data: list[str]) -> int:
     start = datetime.datetime.now().timestamp()
     sections = split_sections(raw_data)
     seeds: list[Seed] = process_seeds_part2(sections)
-    print(
-        f"created {len(seeds)} seeds - {(datetime.datetime.now().timestamp() - start):.2f} seconds"
-    )
+    print(f"seeds done - {(datetime.datetime.now().timestamp() - start):.2f} seconds")
+    # len_seeds = len(seeds)
+    # print(
+    #     f"created {len_seeds} seeds - {(datetime.datetime.now().timestamp() - start):.2f} seconds"
+    # )
     segment = datetime.datetime.now().timestamp()
     process_maps(seeds, sections)
     print(
-        f"processed {len(seeds)} seeds - {(datetime.datetime.now().timestamp() - segment):.2f} / {(datetime.datetime.now().timestamp() - start):.2f} seconds"
+        f"processed seeds - {(datetime.datetime.now().timestamp() - segment):.2f} / {(datetime.datetime.now().timestamp() - start):.2f} seconds"
     )
     segment = datetime.datetime.now().timestamp()
     minimum = min(x.location for x in seeds)
