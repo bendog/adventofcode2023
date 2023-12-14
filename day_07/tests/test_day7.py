@@ -11,3 +11,7 @@ TEST_DATA = [
 
 def test_day7_part1():
     assert day7.part_1(TEST_DATA) == 6440
+
+
+def test_day7_part2():
+    assert day7.part_2(TEST_DATA) == 5905
