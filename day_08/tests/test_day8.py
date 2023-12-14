@@ -12,7 +12,7 @@ TEST_DATA = [
     "ZZZ = (ZZZ, ZZZ)",
 ]
 
-TEST_DATA_2 = [
+TEST_DATA_1B = [
     "LLR",
     "",
     "AAA = (BBB, BBB)",
@@ -21,10 +21,24 @@ TEST_DATA_2 = [
 ]
 
 
+TEST_DATA_2 = [
+    "LR",
+    "",
+    "11A = (11B, XXX)",
+    "11B = (XXX, 11Z)",
+    "11Z = (11B, XXX)",
+    "22A = (22B, XXX)",
+    "22B = (22C, 22C)",
+    "22C = (22Z, 22Z)",
+    "22Z = (22B, 22B)",
+    "XXX = (XXX, XXX)",
+]
+
+
 def test_day8_part1():
     assert day8.part_1(TEST_DATA) == 2
-    assert day8.part_1(TEST_DATA_2) == 6
+    assert day8.part_1(TEST_DATA_1B) == 6
 
 
-# def test_day8_part2():
-#     assert day8.part_2(TEST_DATA) == 5905
+def test_day8_part2():
+    assert day8.part_2(TEST_DATA_2) == 6

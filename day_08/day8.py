@@ -1,3 +1,4 @@
+import math
 from collections import namedtuple
 
 Paths = namedtuple("Paths", "left right")
@@ -8,9 +9,11 @@ def parse_file(raw_data: list[str]) -> tuple[str, dict[str, Paths]]:
     paths = {}
     for line in raw_data[2:]:
         key, path_pair = line.strip().split(" = ")
-        paths[key] = Paths(
-            *[x.strip() for x in path_pair.replace("(", "").replace(")", "").split(", ")]
-        )
+        key = key.strip()
+        if key:
+            paths[key] = Paths(
+                *[x.strip() for x in path_pair.replace("(", "").replace(")", "").split(", ")]
+            )
     return pattern, paths
 
 
@@ -26,27 +29,49 @@ def pattern_generator(pattern: str) -> int:
         yield 0 if pattern[idx] == "L" else 1
 
 
-def pattern_walk(pattern: str, paths: dict[str, Paths]) -> int:
+Walk = namedtuple("Walk", "steps node")
+
+
+def pattern_walk(pattern: str, paths: dict[str, Paths], start_node: str = "AAA") -> Walk:
     steps = 0
-    current_node = "AAA"
+    current_node = start_node
     for step in pattern_generator(pattern):
         new_node = paths[current_node][step]
         steps += 1
-        if new_node == "ZZZ":
-            break
         if new_node == current_node:
             raise NotImplementedError("Dead End")
         current_node = new_node
-    return steps
+        yield Walk(steps, current_node)
 
 
 def part_1(raw_data: list[str]) -> int:
     pattern, paths = parse_file(raw_data)
-    return pattern_walk(pattern, paths)
+    for steps, current_node in pattern_walk(pattern, paths):
+        if current_node[-1] == "Z":
+            return steps
 
 
 def part_2(raw_data: list[str]) -> int:
-    pass
+    pattern, paths = parse_file(raw_data)
+    journeys: dict[str, Walk] = {
+        pkey: pattern_walk(pattern, paths, start_node=pkey)
+        for pkey, pval in paths.items()
+        if pkey[-1] == "A"
+    }
+    # count: int = 0
+    # while True:
+    #     count += 1
+    #     journey_stage: list[Walk] = [v.__next__() for v in journeys.values()]
+    #     print(journey_stage)
+    #     if len([x for x in journey_stage if x.node[-1] != "Z"]) == 0:
+    #         return count
+    taken_steps: list[int] = []
+    for start_node, journey in journeys.items():
+        for steps, current_node in pattern_walk(pattern, paths, start_node=start_node):
+            if current_node[-1] == "Z":
+                break
+        taken_steps.append(steps)
+    return math.lcm(*taken_steps)
 
 
 def get_raw_data(path: str) -> list[str]:
