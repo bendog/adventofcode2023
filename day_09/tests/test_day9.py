@@ -18,5 +18,11 @@ def test_day9_get_next_number():
     assert day9.get_next_number([10, 13, 16, 21, 30, 45]) == 68
 
 
+def test_day9_get_next_number_reverse():
+    assert day9.get_next_number([0, 3, 6, 9, 12, 15], reverse=True) == -3
+    assert day9.get_next_number([1, 3, 6, 10, 15, 21], reverse=True) == 0
+    assert day9.get_next_number([10, 13, 16, 21, 30, 45], reverse=True) == 5
+
+
 # def test_day9_part2():
 #     assert day9.part_2(TEST_DATA) == 6

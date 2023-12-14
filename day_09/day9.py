@@ -1,4 +1,4 @@
-def get_next_number(series: list[int]) -> int:
+def get_next_number(series: list[int], reverse=False) -> int:
     differences = []
     for idx, x in enumerate(series):
         if idx < len(series) - 1:
@@ -6,7 +6,9 @@ def get_next_number(series: list[int]) -> int:
     if set(differences) == {0}:
         return series[-1]
     else:
-        return get_next_number(differences) + series[-1]
+        if reverse:
+            return series[0] - get_next_number(differences, reverse=reverse)
+        return get_next_number(differences, reverse=reverse) + series[-1]
 
 
 def parse_input(raw_data: list[str]) -> list[list[int]]:
@@ -24,7 +26,10 @@ def part_1(raw_data: list[str]) -> int:
 
 
 def part_2(raw_data: list[str]) -> int:
-    pass
+    next_numbers = []
+    for item in parse_input(raw_data):
+        next_numbers.append(get_next_number(item, reverse=True))
+    return sum(next_numbers)
 
 
 def get_raw_data(path: str) -> list[str]:
